@@ -1,4 +1,5 @@
-.checkout
-=========
+A PDF reader app powered by Symfony3 (MicroKernalTrait) and PDFNet SDK
+======================================================================
 
-A Symfony project created on November 17, 2016, 6:25 pm.
+An example of how to incorporate PDFTron PDFNet into symfony a projects
+
