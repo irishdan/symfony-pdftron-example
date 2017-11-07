@@ -1,0 +1,43 @@
+{
+  "name": "Demo PDFTron Symfony integration",
+  "license": "MIT",
+  "type": "project",
+  "autoload": {
+    "psr-4": {
+      "": "src/"
+    },
+    "classmap": [
+      "app/AppKernel.php",
+      "app/AppCache.php",
+      "app/MicroKernel.php"
+    ]
+  },
+  "autoload-dev": {
+    "psr-4": {
+      "Tests\\": "tests/"
+    }
+  },
+  "require": {
+    "php": ">=5.5.9",
+    "symfony/symfony": "3.1.*",
+    "sensio/framework-extra-bundle": "^3.0.2",
+    "irishdan/pdftronbundle": "dev-master"
+  },
+  "require-dev": {
+    "sensio/generator-bundle": "^3.0",
+    "symfony/phpunit-bridge": "^3.0"
+  },
+  "extra": {
+    "symfony-app-dir": "app",
+    "symfony-bin-dir": "bin",
+    "symfony-var-dir": "var",
+    "symfony-web-dir": "web",
+    "symfony-tests-dir": "tests",
+    "symfony-assets-install": "relative",
+    "incenteev-parameters": {
+      "file": "app/config/parameters.yml"
+    },
+    "branch-alias": null
+  },
+  "minimum-stability": "dev"
+}

@@ -1,0 +1,35 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN" "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <title>{% block title %}Welcome!{% endblock %}</title>
+    <style type="text/css">
+        #viewer {
+            /*width: 1024px;*/
+            height: 768px;
+            border: 1px solid grey;
+        }
+    </style>
+    <!-- The jQuery path may need to be updated if when WebViewer updates to new version -->
+    <script type="text/javascript" src="/bundles/pdftron/WebViewer/jquery-3.2.1.min.js"></script>
+    <script type="text/javascript" src="/bundles/pdftron/WebViewer/lib/WebViewer.min.js"></script>
+    <script type="text/javascript">
+        var xodPath = '{{ xodPath }}';
+        $(function () {
+            var viewerElement = document.getElementById('viewer');
+
+            function initPreconverted() {
+                myWebViewer = new PDFTron.WebViewer({
+                    path: "/WebViewer",
+                    initialDoc: xodPath,
+                    streaming: "false"
+                }, viewerElement);
+            }
+
+            initPreconverted();
+        });
+    </script>
+</head>
+<body>
+<div id="viewer"></div>
+</body>
+</html>
