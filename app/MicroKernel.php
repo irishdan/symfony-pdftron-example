@@ -16,6 +16,12 @@ class MicroKernel extends Kernel
 {
     use MicroKernelTrait;
 
+    const PDF_DIRECTORY = 'pdf';
+    const XOD_DIRECTORY = 'web/xod';
+    const IMAGE_DIRECTORY = 'web/images';
+
+    protected $fileSystem;
+
     /**
      * @return array
      */
@@ -32,7 +38,7 @@ class MicroKernel extends Kernel
      */
     protected function configureRoutes(\Symfony\Component\Routing\RouteCollectionBuilder $routes)
     {
-        $routes->add('/', 'kernel:PDFTronWebViewer');
+        $routes->add('/{filename}', 'kernel:PDFTronWebViewer');
     }
 
     /**
@@ -49,10 +55,104 @@ class MicroKernel extends Kernel
         ]);
     }
 
-    public function PDFTronWebViewer()
+    public function PDFTronWebViewer($filename)
     {
-        return new JsonResponse([
-            'Good to go!'
-        ]);
+        // We're probably going to need the filesystem service.
+        $this->fileSystem = $this->getContainer()->get('filesystem');
+
+        // Convert the filename to system filepath
+        // find the path to the PDF if it exists
+        $PDFSystemPath = $this->getPDFSystemPath($filename);
+        if (!empty($PDFSystemPath)) {
+            return new Response('No such PDF file exists ' . $filename);
+        }
+
+        // Get the XOD system path.
+        $XODSystemPath = $this->getXODSystemPath($filename);
+        if (!$this->fileSystem->exists($XODSystemPath)) {
+            // Load the PDFTron wrappers.
+            // You could also add this to your composer.json
+            require_once(__DIR__ . '/../PDFNetWrappers/PDFNetC/Lib/PDFNetPHP.php');
+
+            // The first thing when using PDFTron is to initialize the library.
+            // If you had a license you would pass the license key in here
+            // \PDFNet::Initialize($yourLicenseKey);
+            \PDFNet::Initialize();
+
+            // Add some options.
+            // Not required
+            $xodOptions = new \XODOutputOptions();
+
+            try {
+                \Convert::ToXOD($PDFSystemPath, $XODSystemPath, $xodOptions);
+            } catch (\Exception $e) {
+                return new Response('Ooops unable to create XOD file!!');
+            }
+
+            // @TODO: Writing is up to here so far.
+
+            // Generate a thumbnail from the first page of the PDF.
+            $imageSystemPath = '';
+            $dpi = 72;
+            $imageType = 'JPEG';
+            $page = 1; // We can select any page in the PDF.
+
+            $doc = new \PDFDoc($PDFSystemPath);
+            // @TODO: Whats this about??
+            $doc->InitSecurityHandler();
+
+            // Get the page.
+            $PDFPage = $doc->GetPage($page);
+
+            // Create an image from the PDF.
+            try {
+                $draw = new \PDFDraw();
+                $draw->SetDPI($dpi);
+                $draw->Export($PDFPage, $imageSystemPath, $imageType);
+            } catch (\Exception $e) {
+                return new Response('Ooops unable to create the image file!!');
+            }
+
+
+            $doc->Close();
+
+        }
+
+        // // Web path to the XOD file.
+        // $path = $PDFFileSystem->getXODWebPath($filename);
+        // // Render the Web-viewer.
+        // return new Response($this->getContainer()->get('templating')->render('webviewer.html.twig', [
+        //         'xodPath' => $path]
+        // ));
+    }
+
+    protected function getXODSystemPath($filename)
+    {
+        $this->appendExtensionIfMissing($filename, 'xod');
+        $rootDirectory = $this->getContainer()->getParameter('kernel.root_dir');
+
+        return $rootDirectory . '/../' . self::XOD_DIRECTORY . '/' . $filename;
+    }
+
+    protected function getPDFSystemPath($filename)
+    {
+        $this->appendExtensionIfMissing($filename, 'pdf');
+
+        $rootDirectory = $this->getContainer()->getParameter('kernel.root_dir');
+        $PDFDirectory = $rootDirectory . '/../' . self::PDF_DIRECTORY;
+        $PDFPath = $PDFDirectory . '/' . $filename;
+
+        if ($this->fileSystem->exists($PDFPath)) {
+            return $PDFPath;
+        }
+
+        return false;
+    }
+
+    protected function appendExtensionIfMissing(&$filename, $extension = 'pdf')
+    {
+        if (!preg_match('/(\.' . $extension . ')$/i', $filename)) {
+            $filename .= '.' . $extension;
+        }
     }
 }
