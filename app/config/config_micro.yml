@@ -1,13 +1,9 @@
 imports:
     - { resource: parameters.yml }
     - { resource: services.yml }
-    - { resource: "@PDFTronBundle/Resources/config/services.yml" }
+
 parameters:
     locale: en
-
-pdf_tron:
-    xod_directory: 'web/xod'
-    pdf_directory: 'pdf'
 
 framework:
     #esi:             ~

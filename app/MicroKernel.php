@@ -6,6 +6,7 @@ use Symfony\Bundle\FrameworkBundle\FrameworkBundle;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\Config\Loader\LoaderInterface;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Bundle\TwigBundle\TwigBundle;
 
 /**
@@ -23,7 +24,6 @@ class MicroKernel extends Kernel
         return [
             new FrameworkBundle(),
             new TwigBundle(),
-            new IrishDan\PDFTronBundle\PDFTronBundle(),
         ];
     }
 
@@ -32,7 +32,7 @@ class MicroKernel extends Kernel
      */
     protected function configureRoutes(\Symfony\Component\Routing\RouteCollectionBuilder $routes)
     {
-        $routes->add('/{filename}', 'kernel:XODWebViewer');
+        $routes->add('/', 'kernel:PDFTronWebViewer');
     }
 
     /**
@@ -45,47 +45,14 @@ class MicroKernel extends Kernel
         $loader->load(__DIR__ . '/config/services.yml');
 
         $c->loadFromExtension('framework', [
-            'secret' => 'OiChoiOi',
+            'secret' => 'GoodToGoSecret',
         ]);
     }
 
-    /**
-     * @param $filename
-     * @return Response
-     */
-    public function XODWebViewer($filename)
+    public function PDFTronWebViewer()
     {
-        // Convert the filename to system filepath
-        // find the path of the converted XOD.
-        $PDFFileSystem = $this->getContainer()->get('pdftron.file_system');
-        $fileMapping = $PDFFileSystem->getPDFToXODFileMapping($filename);
-
-        // If the XOD already exists
-        // render it in the twig template.
-        // If it doesn't exist,
-        // create it from the PDf and
-        // render it in the twig template.
-        if (!$PDFFileSystem->exists($fileMapping->XODPath)) {
-            // Check if the pdf exists,
-            // if it does use it to create the xod
-            if ($PDFFileSystem->exists($fileMapping->PDFPath)) {
-                try {
-                    $PDFConverter = $this->getContainer()->get('pdftron.pdf_to_xod');
-                    $PDFConverter->convertPDFToXOD($fileMapping);
-                } catch (\Exception $e) {
-                    return new Response($e->getMessage());
-                }
-            } else {
-                return new Response('No such PDF file exists ' . $filename . '.pdf');
-            }
-        }
-
-        // Web path to the XOD file.
-        $path = $PDFFileSystem->getXODWebPath($filename);
-
-        // Render the Web-viewer.
-        return new Response($this->getContainer()->get('templating')->render('webviewer.html.twig', [
-                'xodPath' => $path]
-        ));
+        return new JsonResponse([
+            'Good to go!'
+        ]);
     }
 }

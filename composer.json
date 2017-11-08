@@ -7,7 +7,6 @@
       "": "src/"
     },
     "classmap": [
-      "app/AppKernel.php",
       "app/AppCache.php",
       "app/MicroKernel.php"
     ]
@@ -19,12 +18,9 @@
   },
   "require": {
     "php": ">=5.5.9",
-    "symfony/symfony": "3.1.*",
-    "sensio/framework-extra-bundle": "^3.0.2",
-    "irishdan/pdftronbundle": "dev-master"
+    "symfony/symfony": "3.3.*"
   },
   "require-dev": {
-    "sensio/generator-bundle": "^3.0",
     "symfony/phpunit-bridge": "^3.0"
   },
   "extra": {
@@ -39,5 +35,5 @@
     },
     "branch-alias": null
   },
-  "minimum-stability": "dev"
+  "minimum-stability": "stable"
 }
