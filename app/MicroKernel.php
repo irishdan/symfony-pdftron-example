@@ -7,6 +7,7 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\Config\Loader\LoaderInterface;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Bundle\TwigBundle\TwigBundle;
 
 /**
@@ -98,7 +99,8 @@ class MicroKernel extends Kernel
             $page = 1; // We can select any page in the PDF.
 
             $doc = new \PDFDoc($PDFSystemPath);
-            // @TODO: Whats this about??
+
+            // should be called immediately after an encrypted document is opened
             $doc->InitSecurityHandler();
 
             // Get the page.
@@ -118,12 +120,22 @@ class MicroKernel extends Kernel
 
         }
 
-        // // Web path to the XOD file.
-        // $path = $PDFFileSystem->getXODWebPath($filename);
-        // // Render the Web-viewer.
-        // return new Response($this->getContainer()->get('templating')->render('webviewer.html.twig', [
-        //         'xodPath' => $path]
-        // ));
+        // Web path to the XOD file.
+        $path = $this->getXODWebPath($filename);
+
+        // Render the Web-viewer.
+        return new Response($this->getContainer()->get('templating')->render('webviewer.html.twig', [
+                'xodPath' => $path]
+        ));
+    }
+
+    protected function getXODWebPath($filename)
+    {
+        $this->appendExtensionIfMissing($filename, 'xod');
+
+        // @TODO: Implement
+
+        return 'xod/' . $filename;
     }
 
     protected function getXODSystemPath($filename)
