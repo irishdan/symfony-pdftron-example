@@ -56,7 +56,12 @@ class MicroKernel extends Kernel
         ]);
     }
 
-    public function PDFTronWebViewer($filename)
+  /**
+   * @param $filename
+   *
+   * @return \Response
+   */
+  public function PDFTronWebViewer($filename)
     {
         // We're probably going to need the filesystem service.
         $this->fileSystem = $this->getContainer()->get('filesystem');
@@ -72,7 +77,9 @@ class MicroKernel extends Kernel
         $XODSystemPath = $this->getXODSystemPath($filename);
         if (!$this->fileSystem->exists($XODSystemPath)) {
             // Load the PDFTron wrappers.
-            // You could also add this to your composer.json
+            // You could also loal in to your composer.json
+            // eg:
+            // "files": [ "PDFNetWrappers/PDFNetC/Lib/PDFNetPHP.php" ]
             require_once(__DIR__ . '/../PDFNetWrappers/PDFNetC/Lib/PDFNetPHP.php');
 
             // The first thing when using PDFTron is to initialize the library.
@@ -89,8 +96,6 @@ class MicroKernel extends Kernel
             } catch (\Exception $e) {
                 return new Response('Ooops unable to create XOD file!!');
             }
-
-            // @TODO: Writing is up to here so far.
 
             // Generate a thumbnail from the first page of the PDF.
             $imageSystemPath = '';
@@ -129,16 +134,24 @@ class MicroKernel extends Kernel
         ));
     }
 
-    protected function getXODWebPath($filename)
+  /**
+   * @param $filename
+   *
+   * @return string
+   */
+  protected function getXODWebPath($filename)
     {
         $this->appendExtensionIfMissing($filename, 'xod');
-
-        // @TODO: Implement
 
         return 'xod/' . $filename;
     }
 
-    protected function getXODSystemPath($filename)
+  /**
+   * @param $filename
+   *
+   * @return string
+   */
+  protected function getXODSystemPath($filename)
     {
         $this->appendExtensionIfMissing($filename, 'xod');
         $rootDirectory = $this->getContainer()->getParameter('kernel.root_dir');
@@ -146,7 +159,12 @@ class MicroKernel extends Kernel
         return $rootDirectory . '/../' . self::XOD_DIRECTORY . '/' . $filename;
     }
 
-    protected function getPDFSystemPath($filename)
+  /**
+   * @param $filename
+   *
+   * @return bool|string
+   */
+  protected function getPDFSystemPath($filename)
     {
         $this->appendExtensionIfMissing($filename, 'pdf');
 
@@ -161,7 +179,11 @@ class MicroKernel extends Kernel
         return false;
     }
 
-    protected function appendExtensionIfMissing(&$filename, $extension = 'pdf')
+  /**
+   * @param        $filename
+   * @param string $extension
+   */
+  protected function appendExtensionIfMissing(&$filename, $extension = 'pdf')
     {
         if (!preg_match('/(\.' . $extension . ')$/i', $filename)) {
             $filename .= '.' . $extension;
